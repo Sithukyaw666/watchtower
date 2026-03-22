@@ -342,6 +342,7 @@ func (client dockerClient) IsContainerStale(container t.Container, params t.Upda
 
 		if bestTag != "" {
 			log.Debugf("Selected best tag %s for container %s", bestTag, container.ImageName())
+			container.SetTargetTag(bestTag)
 		}
 	}
 
