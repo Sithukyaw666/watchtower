@@ -32,10 +32,6 @@ func BuildManifestURL(container types.Container) (string, error) {
 		"host":       host,
 	}).Debug("Parsing image ref")
 
-	if err != nil {
-		return "", err
-	}
-
 	url := url2.URL{
 		Scheme: "https",
 		Host:   host,

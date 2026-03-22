@@ -89,6 +89,8 @@ func ListTags(container watchtowerTypes.Container, registryAuth string) ([]strin
 		return nil, err
 	}
 	req.Header.Set("Authorization", token)
+	req.Header.Set("User-Agent", "Watchtower (Docker)")
+	req.Header.Set("Accept", "application/json")
 
 	res, err := client.Do(req)
 	if err != nil {
