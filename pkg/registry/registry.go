@@ -1,7 +1,13 @@
 package registry
 
 import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+
+	"github.com/containrrr/watchtower/pkg/registry/auth"
 	"github.com/containrrr/watchtower/pkg/registry/helpers"
+	"github.com/containrrr/watchtower/pkg/registry/manifest"
 	watchtowerTypes "github.com/containrrr/watchtower/pkg/types"
 	ref "github.com/distribution/reference"
 	"github.com/docker/docker/api/types"
@@ -58,4 +64,46 @@ func WarnOnAPIConsumption(container watchtowerTypes.Container) bool {
 	}
 
 	return false
+}
+
+type tagsListResponse struct {
+	Name string   `json:"name"`
+	Tags []string `json:"tags"`
+}
+
+func ListTags(container watchtowerTypes.Container, registryAuth string) ([]string, error) {
+	token, err := auth.GetToken(container, registryAuth)
+
+	if err != nil {
+		return nil, err
+	}
+
+	tagsUrl, err := manifest.BuildTagURL(container)
+	if err != nil {
+		return nil, err
+	}
+
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", tagsUrl, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", token)
+
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer res.Body.Close()
+
+	if res.StatusCode != 200 {
+		return nil, fmt.Errorf("registry responded to tags list request with %q", res.Status)
+	}
+
+	var response tagsListResponse
+	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
+		return nil, err
+	}
+	return response.Tags, nil
 }

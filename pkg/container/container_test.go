@@ -243,7 +243,7 @@ var _ = Describe("the container", func() {
 						"com.centurylinklabs.zodiac.original-image": "the-original-image",
 					}))
 					imageName := c.ImageName()
-					Expect(imageName).To(Equal(imageName))
+					Expect(imageName).To(Equal("the-original-image:latest"))
 				})
 			})
 			It("should return the image name", func() {
@@ -257,6 +257,20 @@ var _ = Describe("the container", func() {
 				c = MockContainer(WithImageName(name))
 				imageName := c.ImageName()
 				Expect(imageName).To(Equal(name + ":latest"))
+			})
+			It("should return the image name with the target tag when set", func() {
+				name := "image-name:v1"
+				c = MockContainer(WithImageName(name))
+				c.SetTargetTag("v2")
+				imageName := c.ImageName()
+				Expect(imageName).To(Equal("image-name:v2"))
+			})
+			It("should handle images without initial tags when target tag is set", func() {
+				name := "image-name"
+				c = MockContainer(WithImageName(name))
+				c.SetTargetTag("v2")
+				imageName := c.ImageName()
+				Expect(imageName).To(Equal("image-name:v2"))
 			})
 		})
 

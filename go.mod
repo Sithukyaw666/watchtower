@@ -1,8 +1,9 @@
 module github.com/containrrr/watchtower
 
-go 1.20
+go 1.21
 
 require (
+	github.com/Masterminds/semver/v3 v3.4.0
 	github.com/containrrr/shoutrrr v0.8.0
 	github.com/distribution/reference v0.5.0
 	github.com/docker/cli v24.0.7+incompatible

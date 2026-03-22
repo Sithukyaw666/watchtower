@@ -32,6 +32,7 @@ type Container struct {
 
 	containerInfo *types.ContainerJSON
 	imageInfo     *types.ImageInspect
+	targetTag     string
 }
 
 // IsLinkedToRestarting returns the current value of the LinkedToRestarting field for the container
@@ -106,6 +107,16 @@ func (c Container) ImageName() string {
 	imageName, ok := c.getLabelValue(zodiacLabel)
 	if !ok {
 		imageName = c.containerInfo.Config.Image
+	}
+
+	if c.targetTag != "" {
+		i := strings.LastIndex(imageName, ":")
+		j := strings.LastIndex(imageName, "/")
+		if i > j {
+			imageName = imageName[:i] + ":" + c.targetTag
+		} else {
+			imageName = imageName + ":" + c.targetTag
+		}
 	}
 
 	if !strings.Contains(imageName, ":") {
@@ -401,4 +412,12 @@ func (c Container) VerifyConfiguration() error {
 	}
 
 	return nil
+}
+
+func (c *Container) SetTargetTag(tag string) {
+	c.targetTag = tag
+}
+
+func (c *Container) TargetTag() string {
+	return c.targetTag
 }

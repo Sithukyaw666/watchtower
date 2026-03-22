@@ -75,4 +75,6 @@ type Container interface {
 	IsRestarting() bool
 	GetCreateConfig() *dc.Config
 	GetCreateHostConfig() *dc.HostConfig
+	SetTargetTag(string)
+	TargetTag() string
 }

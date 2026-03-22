@@ -319,6 +319,32 @@ func (client dockerClient) RenameContainer(c t.Container, newName string) error 
 func (client dockerClient) IsContainerStale(container t.Container, params t.UpdateParams) (stale bool, latestImage t.ImageID, err error) {
 	ctx := context.Background()
 
+	strategy := container.ContainerInfo().Config.Labels["com.centurylinklabs.watchtower.tag-strategy"]
+	filter := container.ContainerInfo().Config.Labels["com.centurylinklabs.watchtower.tag-filter"]
+
+	if strategy != "" && strategy != "static" {
+		log.Debugf("Container %s has dynamic tag strategy: %s", container.Name(), strategy)
+
+		imageName := container.ImageName()
+		registryAuth, err := registry.EncodedAuth(imageName)
+		if err != nil {
+			log.Warnf("Could not retrive registry auth for %s: %v", imageName, err)
+		}
+		tags, err := registry.ListTags(container, registryAuth)
+		if err != nil {
+			return false, container.SafeImageID(), fmt.Errorf("failed to list tags: %v", err)
+		}
+
+		bestTag, err := SelectBestTag(tags, strategy, filter)
+		if err != nil {
+			return false, container.SafeImageID(), fmt.Errorf("failed to select best tag: %v", err)
+		}
+
+		if bestTag != "" {
+			log.Debugf("Selected best tag %s for container %s", bestTag, container.ImageName())
+		}
+	}
+
 	if container.IsNoPull(params) {
 		log.Debugf("Skipping image pull.")
 	} else if err := client.PullImage(ctx, container); err != nil {

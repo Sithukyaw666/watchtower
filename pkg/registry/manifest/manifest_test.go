@@ -57,6 +57,16 @@ var _ = Describe("the manifest module", func() {
 			Expect(URL).To(BeEmpty())
 		})
 	})
+	Describe("BuildTagsURL", func() {
+		It("should return a valid tags list URL", func() {
+			imageRef := "ghcr.io/containrrr/watchtower:v1.0.0"
+			expected := "https://ghcr.io/v2/containrrr/watchtower/tags/list"
+
+			URL, err := buildMockContainerTagsURL(imageRef)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(URL).To(Equal(expected))
+		})
+	})
 })
 
 func buildMockContainerManifestURL(imageRef string) (string, error) {
@@ -71,4 +81,18 @@ func buildMockContainerManifestURL(imageRef string) (string, error) {
 	mock := mocks.CreateMockContainerWithImageInfo(mockID, mockName, imageRef, mockCreated, imageInfo)
 
 	return manifest.BuildManifestURL(mock)
+}
+
+func buildMockContainerTagsURL(imageRef string) (string, error) {
+	imageInfo := apiTypes.ImageInspect{
+		RepoTags: []string{
+			imageRef,
+		},
+	}
+	mockID := "mock-id"
+	mockName := "mock-container"
+	mockCreated := time.Now()
+	mock := mocks.CreateMockContainerWithImageInfo(mockID, mockName, imageRef, mockCreated, imageInfo)
+
+	return manifest.BuildTagURL(mock)
 }

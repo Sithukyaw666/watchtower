@@ -43,3 +43,20 @@ func BuildManifestURL(container types.Container) (string, error) {
 	}
 	return url.String(), nil
 }
+
+func BuildTagURL(container types.Container) (string, error) {
+	normalizedRef, err := ref.ParseDockerRef(container.ImageName())
+	if err != nil {
+		return "", err
+	}
+
+	host, _ := helpers.GetRegistryAddress(normalizedRef.Name())
+	img := ref.Path(normalizedRef)
+
+	url := url2.URL{
+		Scheme: "https",
+		Host:   host,
+		Path:   fmt.Sprintf("v2/%s/tags/list", img),
+	}
+	return url.String(), nil
+}
