@@ -319,8 +319,8 @@ func (client dockerClient) RenameContainer(c t.Container, newName string) error 
 func (client dockerClient) IsContainerStale(container t.Container, params t.UpdateParams) (stale bool, latestImage t.ImageID, err error) {
 	ctx := context.Background()
 
-	strategy := container.ContainerInfo().Config.Labels["com.centurylinklabs.watchtower.tag-strategy"]
-	filter := container.ContainerInfo().Config.Labels["com.centurylinklabs.watchtower.tag-filter"]
+	strategy := container.ContainerInfo().Config.Labels[tagStrategyLabel]
+	filter := container.ContainerInfo().Config.Labels[tagFilterLabel]
 
 	if strategy != "" && strategy != "static" {
 		log.Debugf("Container %s has dynamic tag strategy: %s", container.Name(), strategy)
