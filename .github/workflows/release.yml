@@ -183,14 +183,6 @@ jobs:
             docker manifest push ghcr.io/sithukyaw666/watchtower:$(echo $TAG | sed 's/^v*//') && \
             docker manifest push ghcr.io/sithukyaw666/watchtower:latest
 
-  renew-docs:
-    name: Refresh pkg.go.dev
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - name: Pull new module version
-      uses: andrewslotin/go-proxy-pull-action@50fea06a976087614babb9508e5c528b464f4645 #master@2022-10-14
-
   
   
 
