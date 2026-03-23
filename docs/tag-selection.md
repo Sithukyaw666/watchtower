@@ -22,19 +22,35 @@ The `semver` strategy allows watchtower to find the highest versioned tag availa
 3. It parses the remaining tags as semantic versions.
 4. It selects the highest version and updates the container to use that tag.
 
-### Coercion
+### Coercion and Prefix Support
 
-The `semver` strategy is flexible and can handle versions that are not strictly SemVer-compliant by "coercing" them. For example:
+The `semver` strategy is flexible but has specific rules for prefixes:
 
-- `v1.0` is treated as `1.0.0`
-- `2.1` is treated as `2.1.0`
-- `v1` is treated as `1.0.0`
+- **Supported Prefixes**: Only the letter `v` (case-insensitive) is supported as a prefix (e.g., `v1.0.0`).
+- **Unsupported Prefixes**: Custom prefixes like `demo1.0.0` or `app-2.0` will result in a parsing error and the tag will be skipped.
+- **Auto-completion**: 2-part versions are automatically completed (e.g., `1.0` becomes `1.0.0`).
 
-### Examples
+## Performance & Best Practices
+
+Using tag selection involves an $O(N)$ operation where $N$ is the number of tags in your registry repository. For large repositories with thousands of tags, this can cause performance hits or registry rate-limiting.
+
+### Infrastructure Optimization
+
+To keep scans fast and efficient:
+
+- **Repository Sharding**: Separate your "Development" and "Production" images into different repositories. This keeps the number of tags per repository small.
+- **Tag Pruning**: Periodically delete old or unused tags from your registry.
+- **Specific Filtering**: Use a narrow `tag-filter` regex. While watchtower still has to list all tags, a specific regex reduces the amount of strings that need to be parsed by the SemVer engine.
+
+### GitOps for High-Frequency Releases
+
+If your project has a high-velocity release cycle or requires a strict audit trail for every deployment, consider using a GitOps tool like [Watcher](https://github.com/Sithukyaw666/watcher).
+
+While Watchtower is excellent for background image updates, Watcher is designed specifically for Docker Compose GitOps. It uses your Git repository as the "Source of Truth," ensuring that every deployment is deterministic and tracked in your version control history.
+
+## Examples
 
 #### Automatic Minor/Patch Updates
-
-If you want your container to automatically update to the latest `v1.x.x` version but never switch to `v2.x.x`, you can use a filter.
 
 === "docker-compose"
 
@@ -47,20 +63,7 @@ If you want your container to automatically update to the latest `v1.x.x` versio
           com.centurylinklabs.watchtower.tag-filter: "^v1\\.\\d+\\.\\d+$"
     ```
 
-=== "docker run"
-
-    ```bash
-    docker run -d \
-      --label com.centurylinklabs.watchtower.tag-strategy=semver \
-      --label com.centurylinklabs.watchtower.tag-filter="^v1\.\d+\.\d+$" \
-      myorg/myapp:v1.0.0
-    ```
-
-In this example, if the registry has `v1.0.1`, `v1.1.0`, and `v2.0.0`, watchtower will identify `v1.1.0` as the highest semantic version and update your container.
-
-#### Flexible Versioning
-
-If you use tags like `v0.1` and `v1.0`:
+#### Flexible Versioning (Coercion)
 
 === "docker-compose"
 
@@ -72,5 +75,3 @@ If you use tags like `v0.1` and `v1.0`:
           com.centurylinklabs.watchtower.tag-strategy: semver
           com.centurylinklabs.watchtower.tag-filter: "^v\\d+\\.\\d+$"
     ```
-
-Watchtower will correctly identify `v1.0` as higher than `v0.1` even though they are missing the patch number.
