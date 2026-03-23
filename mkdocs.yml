@@ -41,6 +41,7 @@ nav:
    - 'Arguments': 'arguments.md'
    - 'Notifications': 'notifications.md'
    - 'Container selection': 'container-selection.md'
+   - 'Tag selection': 'tag-selection.md'
    - 'Private registries': 'private-registries.md'
    - 'Linked containers': 'linked-containers.md'
    - 'Remote hosts': 'remote-hosts.md'

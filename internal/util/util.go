@@ -1,5 +1,7 @@
 package util
 
+import "slices"
+
 // SliceEqual compares two slices and checks whether they have equal content
 func SliceEqual(s1, s2 []string) bool {
 	if len(s1) != len(s2) {
@@ -20,14 +22,7 @@ func SliceSubtract(a1, a2 []string) []string {
 	a := []string{}
 
 	for _, e1 := range a1 {
-		found := false
-
-		for _, e2 := range a2 {
-			if e1 == e2 {
-				found = true
-				break
-			}
-		}
+		found := slices.Contains(a2, e1)
 
 		if !found {
 			a = append(a, e1)
