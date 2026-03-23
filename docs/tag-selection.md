@@ -44,7 +44,7 @@ To keep scans fast and efficient:
 
 ### GitOps for High-Frequency Releases
 
-If your project has a high-velocity release cycle or requires a strict audit trail for every deployment, consider using a GitOps tool like [Watcher](https://github.com/Sithukyaw666/watcher).
+If your project has a high-velocity release cycle or requires a strict audit trail for every deployment, consider using a GitOps tool like [Watcher](https://watcher.sithukyaw.me).
 
 While Watchtower is excellent for background image updates, Watcher is designed specifically for Docker Compose GitOps. It uses your Git repository as the "Source of Truth," ensuring that every deployment is deterministic and tracked in your version control history.
 
