@@ -1,6 +1,6 @@
 <div align="center">
 
-  ### ⚠️ This project is no longer maintained
+  ### This project is forked from containrrr/watchtower 
   See https://github.com/containrrr/watchtower/discussions/2135 for details.
 
   ---
