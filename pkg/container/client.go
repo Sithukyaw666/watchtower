@@ -330,6 +330,7 @@ func (client dockerClient) IsContainerStale(container t.Container, params t.Upda
 		if err != nil {
 			log.Warnf("Could not retrive registry auth for %s: %v", imageName, err)
 		}
+		registryAuth = digest.TransformAuth(registryAuth)
 		tags, err := registry.ListTags(container, registryAuth)
 		if err != nil {
 			return false, container.SafeImageID(), fmt.Errorf("failed to list tags: %v", err)
